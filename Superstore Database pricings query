@@ -1,0 +1,36 @@
+CREATE TABLE ecom_data (
+    user_id VARCHAR(50),
+    session_duration INT,
+    purchase_flag BIT,
+    amount_spent DECIMAL(10, 2),
+    item_name VARCHAR(50)
+);
+
+INSERT INTO ecom_data (user_id, session_duration, purchase_flag, amount_spent, item_name)
+VALUES
+    ('aBcDeF123456', 3, 1, 25.50, 'Wireless Earbuds'),
+    ('gHiJkL789012', 4, 0, 0.00, NULL),
+    ('mNoPqR345678', 6, 1, 75.20, 'Smartphone Case'),
+    ('sTuVwX901234', 2, 0, 0.00, NULL),
+    ('yZaBcD567890', 5, 1, 10.75, 'Portable Charger'),
+    ('eFgHiJ123456', 4, 0, 0.00, NULL),
+    ('kLmNoP789012', 1, 1, 50.00, 'Bluetooth Speaker'),
+    ('qRsTuV345678', 2, 0, 0.00, NULL),
+    ('wXyZaB901234', 3, 1, 20.90, 'Fitness Tracker'),
+    ('zN53qR345321', 6, 1, 75.20, 'Smartphone Case'),
+    ('QrSFgH561764', 1, 1, 50.00, 'Bluetooth Speaker'),
+    ('cDeFgH567890', 4, 1, 150.75, 'Smartwatch');
+    
+-- © Copyright 2025 Break Into Tech  --
+
+
+
+--For this project, I used SQL to query the superstore database to get pricing information for items above 40.00 in value and ordered from lowest price to highest price
+
+--Use a SELECT statement to select all information
+SELECT *
+FROM superstore
+
+--Use a WHERE statement and ORDER BY statement to filter pricings and the order they are shown listed in the table shown after running the query
+WHERE price > 40.00
+ORDER BY price asc
