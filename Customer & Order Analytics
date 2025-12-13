@@ -1,0 +1,49 @@
+--In this SQL in Sqlite Studio, I am querying for customer and order info
+
+--1  How many orders were placed in January? 
+SELECT Count(DISTINCT Jan.orderID)
+FROM BIT_DB.JanSales Jan
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID';
+
+--2  How many of those orders were for an iPhone?
+SELECT Count(DISTINCT Jan.orderID)
+FROM BIT_DB.JanSales Jan
+WHERE product = 'iPhone'
+AND length(orderid) = 6
+AND orderid <> 'Order ID';
+
+--3  Select the customer account numbers for all the orders that were placed in February. 
+SELECT DISTINCT acctnum
+FROM BIT_DB.customers cus
+JOIN BIT_DB.FebSales Feb
+ON cus.order_id = Feb.orderID
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID';
+
+--4  Which product was the cheapest one sold in January, and what was the price? 
+SELECT Min(price), Product
+FROM BIT_DB.JanSales;
+
+--5  What is the total revenue for each product sold in January?
+SELECT Product, Sum(Quantity * price) AS Revenue
+  FROM BIT_DB.JanSales
+ GROUP BY Product;
+
+--6  Which products were sold in February at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
+SELECT Product, SUM(Quantity) AS Total_Quantity, SUM(Quantity * price) AS Total_Revenue
+FROM BIT_DB.FebSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+AND length(orderid) = 6
+AND orderid <> 'Order ID'
+GROUP BY Product;
+
+--7 How many customers ordered more than 2 products at a time, and what was the average amount spent for those customers?
+SELECT COUNT(DISTINCT cust.acctnum),
+AVG(price * Quantity) AS Average_amount_spent
+FROM BIT_DB.FebSales Feb
+LEFT JOIN BIT_DB.customers cust
+ON Feb.orderID = cust.order_id
+WHERE Feb.Quantity > 2
+AND LENGTH(order_id) = 6
+AND orderid <> 'Order ID';
