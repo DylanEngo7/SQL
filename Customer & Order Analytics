@@ -47,3 +47,22 @@ ON Feb.orderID = cust.order_id
 WHERE Feb.Quantity > 2
 AND LENGTH(order_id) = 6
 AND orderid <> 'Order ID';
+
+--8 What employee ID has characters that:
+-- Start with ‘14’
+-- Have a single character after ‘14’
+-- End with ‘9’
+SELECT employee_ID
+FROM employees
+WHERE employee_ID LIKE '14_9';
+
+
+--9 What order ID has characters that:
+-- Start with ‘16’
+-- Have a single character after ‘16’
+-- Followed by ‘0’
+-- And any number of characters in the last position
+SELECT orderID
+FROM BIT_DB.MarSales
+WHERE orderID LIKE '16_0%';
+
