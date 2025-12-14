@@ -66,3 +66,59 @@ SELECT orderID
 FROM BIT_DB.MarSales
 WHERE orderID LIKE '16_0%';
 
+--10 How many of each type of headphone were sold in February?
+SELECT DISTINCT Product, SUM(Quantity)
+FROM BIT_DB.FebSales Feb
+WHERE Product LIKE '%headphones%'
+AND length(orderid) = 6
+AND orderid <> 'Order ID'
+GROUP BY Product;
+
+--11 What was the average amount spent per account in February?
+SELECT cus.acctnum, AVG(Quantity*price)
+FROM BIT_DB.FebSales Feb
+LEFT JOIN BIT_DB.customers cus
+ON Feb.orderID = cus.order_id
+WHERE length(orderid) = 6
+AND orderid <> 'Order ID';
+
+--12 What order ids are from Georgia, where the order has an average price greater than $1,000, that also have an order date beginning in '04/1'?
+SELECT orderID
+FROM BIT_DB.AprSales
+WHERE location LIKE '%GA%'
+AND orderdate LIKE '04/1%'
+AND length(orderid) = 6
+AND orderid <> 'Order ID'
+GROUP BY orderID
+HAVING AVG(price) > 1000;
+
+--13 How do you reverse engineer these results using a query?
+--MaySales Results
+--location	orderID
+--818 Wilson St, Los Angeles, CA 90001        	194305
+--2 Center St, Austin, TX 73301	             194315
+--960 Park St, San Francisco, CA 94016             	194325
+--53 Ridge St, Portland, OR 97035	             194335
+--734 Hickory St, New York City, NY 10001	194345
+--196 Cherry St, Portland, OR 97035	             194355
+--924 13th St, Los Angeles, CA 90001	             194365
+--602 Washington St, New York City, NY 10001	194375
+--399 12th St, San Francisco, CA 94016	             194385
+--434 Pine St, Seattle, WA 98101	             194395
+SELECT location, orderID
+FROM BIT_DB.MaySales
+WHERE orderID LIKE '1943_5'
+ORDER BY orderID;
+
+--14 Which product brought in the most revenue in January and how much revenue did it bring in total?
+SELECT Product, SUM(Quantity*price)
+FROM BIT_DB.JanSales
+GROUP BY Product
+ORDER BY sum(quantity*price) desc
+LIMIT 1;
+
+
+
+
+
+
