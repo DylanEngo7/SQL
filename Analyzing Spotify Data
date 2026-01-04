@@ -35,3 +35,12 @@ FROM BIT_DB.Spotifydata
 WHERE popularity > 86.75
 AND danceability > 0.6804
 ORDER BY AVGpopularity desc;
+
+--Now, I will utilize a CTE to find the top stars in the database
+WITH tempTable AS (
+SELECT artist_name, AVG(popularity) AS average_popularity
+FROM BIT_DB.Spotifydata
+WHERE popularity > 90
+GROUP BY artist_name)
+SELECT artist_name AS "Top Star", average_popularity
+FROM tempTable;
