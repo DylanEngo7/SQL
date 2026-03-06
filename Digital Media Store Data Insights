@@ -1,0 +1,160 @@
+--This project, I used a dataset called chinook to find various relevant information for a Digital Media Store.
+I used SqLite Studio and downloaded the data tables queried below using this link: 
+
+https://uploads.teachablecdn.com/attachments/s6T8aUXlQqlcNDocTc9D_chinook.zip
+
+-- Using the following SQL queries, we can
+
+-- 1.) Show Customers (their full names, customer ID, and country) who are not in the US
+
+SELECT CustomerId, FirstName, LastName, Country
+FROM chinook.customers
+WHERE country != 'USA';
+
+-- 2.) Show only the Customers from Brazil
+
+SELECT CustomerId, FirstName, LastName, Country
+FROM chinook.customers
+WHERE country = 'Brazil';
+
+-- 3.) Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country
+
+SELECT cust.FirstName, cust.LastName, cust.Country, inv.InvoiceId, inv.InvoiceDate, inv.BillingCountry
+FROM chinook.invoices as inv
+LEFT JOIN chinook.customers as cust
+ON inv.CustomerId = cust.CustomerId
+WHERE inv.BillingCountry = 'Brazil';
+
+-- 4.) Show the Employees who are Sales Agents.
+
+SELECT emp.FirstName, emp.LastName
+FROM chinook.employees as emp
+WHERE Title = 'Sales Support Agent';
+
+-- 5.) Find a unique/distinct list of billing countries from the Invoice table
+
+SELECT DISTINCT i.BillingCountry
+FROM chinook.invoices i;
+
+-- 6.) Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name.
+
+SELECT e.FirstName, e.LastName, i.InvoiceId
+FROM chinook.employees AS e
+FULL JOIN chinook.customers AS c
+ON e.EmployeeId = c.SupportRepId
+FULL JOIN chinook.invoices AS i
+ON c.CustomerId = i.CustomerId;
+
+-- 7.) Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+
+SELECT
+c.FirstName AS CustomerFirst,
+c.LastName  AS CustomerLast,
+e.FirstName AS EmployeeFirst,
+e.LastName  AS EmployeeLast, c.Country,
+i.Total
+FROM invoices i
+FULL JOIN customers c
+ON i.CustomerId = c.CustomerId
+FULL JOIN employees e
+ON c.SupportRepId = e.EmployeeId
+FULL JOIN invoice_items ii
+ON ii.InvoiceId = i.InvoiceId;
+
+-- 8.) Show how many Invoices were there in 2009
+
+SELECT COUNT(InvoiceID)
+FROM invoices
+WHERE InvoiceDate = '2009';
+
+-- 9.) Find the total sales for 2009
+
+SELECT COUNT(ii.InvoiceID), UnitPrice, Quantity
+FROM invoice_items ii
+JOIN invoices i
+ON ii.InvoiceID = i.InvoiceID
+WHERE InvoiceDate = '2009';
+
+-- 10.) Write a query that includes the purchased track name with each invoice line ID
+
+SELECT ii.InvoiceLineID, t.Name AS track_name
+FROM invoice_items ii
+LEFT JOIN invoices i
+ON ii.InvoiceId = i.InvoiceId
+LEFT JOIN playlists p
+ON i.InvoiceId = p.PlaylistId
+LEFT JOIN tracks t
+ON p.PlaylistId = t.TrackId;
+
+-- 11.) Write a query that includes the purchased track name AND artist name with each invoice line ID.
+
+SELECT ii.InvoiceLineID, a.Name AS artist_group_name, t.Name AS track_name, t.Composer AS artist_name
+FROM invoice_items ii
+LEFT JOIN playlist_track pt
+ON pt.TrackId = ii.InvoiceLineId
+LEFT JOIN playlists p
+ON p.PlaylistId = pt.PlaylistId
+LEFT JOIN tracks t
+ON t.TrackId = p.PlaylistId
+LEFT JOIN artists a
+ON t.AlbumId = a.ArtistId
+WHERE InvoiceLineId != 'NULL'
+ORDER BY ii.InvoiceLineId asc;
+
+-- 12.) Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+
+SELECT t.Name AS tracks, mt.Name AS media_type, g.Name AS genre
+FROM tracks t
+LEFT JOIN media_types mt
+ON t.GenreId = mt.MediaTypeId
+LEFT JOIN genres g
+ON t.GenreId = g.GenreId;
+
+
+-- 13.) Show the total sales made by each sales agent.
+
+SELECT e.FirstName, e.LastName, COUNT(DISTINCT i.InvoiceId) AS InvoiceCount
+FROM employees e
+LEFT JOIN customers c
+ON e.EmployeeId = c.SupportRepId
+LEFT JOIN invoices i
+ON c.CustomerId = i.CustomerId
+GROUP BY e.EmployeeId, e.FirstName, e.LastName;
+
+-- 14.) Find how much total the sales agents sold in digital media in 2009
+
+SELECT e.FirstName, e.LastName, SUM(ii.Quantity*ii.UnitPrice)
+FROM employees e
+LEFT JOIN customers c
+ON e.EmployeeId = c.SupportRepId
+LEFT JOIN invoices i
+ON c.CustomerId = i.CustomerId
+LEFT JOIN invoice_items ii
+ON i.InvoiceId = ii.InvoiceId
+GROUP BY e.FirstName, e.LastName
+ORDER BY TotalSales DESC
+LIMIT 1;
+
+-- 15.) How much did customers spend?
+
+SELECT c.FirstName, c.LastName, SUM(ii.UnitPrice * ii.Quantity) AS total_spent
+FROM chinook.customers c
+LEFT JOIN invoices i
+ON c.CustomerId = i.CustomerId
+LEFT JOIN invoice_items ii
+ON i.InvoiceId = ii.InvoiceId
+GROUP BY c.CustomerId, c.FirstName, c.LastName;
+
+-- 16.) How much has each sales agent made for the company?
+
+SELECT e.FirstName, e.LastName, e.Title, SUM(ii.Quantity * ii.UnitPrice) AS total_sold
+FROM chinook.employees e
+LEFT JOIN chinook.customers c
+ON e.EmployeeId = c.SupportRepId
+LEFT JOIN chinook.invoices i
+ON c.CustomerId = i.CustomerId
+LEFT JOIN chinook.invoice_items ii
+ON i.InvoiceId = ii.InvoiceId
+WHERE e.Title LIKE '%Sales%'
+AND e.Title NOT LIKE '%Manager%'
+GROUP BY e.EmployeeId, e.FirstName, e.LastName, e.Title;
